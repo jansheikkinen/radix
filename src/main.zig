@@ -2,7 +2,7 @@
 
 const std = @import("std");
 
-const RadixInteger = struct {
+pub const RadixInteger = struct {
   // NOTE: for consistency, base 64 does NOT match the standards
   const DIGIT_CHARS = "0123456789" ++
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ" ++
@@ -130,22 +130,6 @@ const RadixInteger = struct {
     return digits.toOwnedSlice();
   }
 };
-
-pub fn main() !void {
-  var gpa = std.heap.GeneralPurposeAllocator(.{}) {};
-  defer _ = gpa.deinit();
-  const allocator = gpa.allocator();
-
-  const integer = try RadixInteger.fromString("-36rFUCK");
-  const str = try integer.toString(allocator);
-  defer allocator.free(str);
-
-  std.debug.print("Base 10: {d}, Base {d}: {s}", .{
-    integer.value,
-    integer.radix,
-    str
-  });
-}
 
 
 const testing = std.testing;
