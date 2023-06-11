@@ -3,16 +3,15 @@
 const std = @import("std");
 
 pub const RadixInteger = struct {
-  // NOTE: for consistency, base 64 does NOT match the standards
   const DIGIT_CHARS = "0123456789" ++
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ" ++
-    "abcdefghijklmnopqrstuvwxyz+/";
+    "abcdefghijklmnopqrstuvwxyz";
 
   radix: u8 = 10,
   value: isize,
 
   pub fn init(radix: u8, value: isize) !RadixInteger {
-    if (radix < 2 or radix > 64) return error.InvalidRadix;
+    if (radix < 2 or radix > 62) return error.InvalidRadix;
     return RadixInteger { .radix = radix, .value = value };
   }
 
@@ -136,7 +135,7 @@ const testing = std.testing;
 
 test "Radix Out of Bound" {
   try testing.expectError(error.InvalidRadix, RadixInteger.init(1, 0));
-  try testing.expectError(error.InvalidRadix, RadixInteger.init(65, 0));
+  try testing.expectError(error.InvalidRadix, RadixInteger.init(63, 0));
 }
 
 
@@ -170,7 +169,7 @@ test "fromString -- Value Digit Counts" {
 
 test "fromString -- Smallest and Largest Radix" {
   try testing.expectEqual((try RadixInteger.fromString("2r1000101")).value, 69);
-  try testing.expectEqual((try RadixInteger.fromString("64rz+/")).value, 253887);
+  try testing.expectEqual((try RadixInteger.fromString("62r1z")).value, 123);
 }
 
 test "fromString -- Implicit Radix" {
@@ -196,9 +195,9 @@ test "toString -- Smallest and Largest Radix" {
   try testing.expectEqualStrings(string, "2r1000101");
   testing.allocator.free(string);
 
-  number = try RadixInteger.init(64, 253887);
+  number = try RadixInteger.init(62, 123);
   string = try number.toString(testing.allocator);
-  try testing.expectEqualStrings(string, "64rz+/");
+  try testing.expectEqualStrings(string, "62r1z");
   testing.allocator.free(string);
 }
 
